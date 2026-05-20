@@ -1,0 +1,12 @@
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: ybuddy_db
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: ybuddy_db
+      MARIADB_USER: ybuddy
+      MARIADB_PASSWORD: ybuddy_pass
