@@ -59,42 +59,67 @@ export default function LoginPage() {
           <h2 className="text-3xl font-bold text-white mb-2">Welcome back</h2>
           <p className="text-gray-400 mb-8">Sign in to your account</p>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          {/* RGAA 4.1 — Critère 11.1 : chaque champ a un label associé via htmlFor/id */}
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate aria-label="Formulaire de connexion">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+              <label htmlFor="login-email" className="block text-sm font-medium text-gray-300 mb-2">
+                Adresse email <span aria-hidden="true" className="text-red-400">*</span>
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" aria-hidden="true" />
                 <input
+                  id="login-email"
                   type="email"
                   className="input-field pl-10"
-                  placeholder="you@example.com"
+                  placeholder="vous@exemple.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  aria-required="true"
+                  autoComplete="email"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+              <label htmlFor="login-password" className="block text-sm font-medium text-gray-300 mb-2">
+                Mot de passe <span aria-hidden="true" className="text-red-400">*</span>
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" aria-hidden="true" />
                 <input
+                  id="login-password"
                   type={showPass ? 'text' : 'password'}
                   className="input-field pl-10 pr-10"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  aria-required="true"
+                  autoComplete="current-password"
                 />
-                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
-                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {/* RGAA 4.1 — Critère 11.9 : bouton avec aria-label explicite */}
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                  aria-label={showPass ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                  aria-pressed={showPass}
+                >
+                  {showPass ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                 </button>
               </div>
             </div>
 
-            <button type="submit" disabled={loading} className="btn-gold w-full flex items-center justify-center gap-2 py-3">
-              {loading ? <div className="w-5 h-5 border-2 border-navy-900 border-t-transparent rounded-full animate-spin" /> : 'Sign In'}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-gold w-full flex items-center justify-center gap-2 py-3"
+              aria-busy={loading}
+            >
+              {loading
+                ? <><div className="w-5 h-5 border-2 border-navy-900 border-t-transparent rounded-full animate-spin" aria-hidden="true" /><span className="sr-only">Connexion en cours…</span></>
+                : 'Se connecter'}
             </button>
           </form>
 

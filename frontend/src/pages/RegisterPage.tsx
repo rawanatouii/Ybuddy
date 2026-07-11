@@ -42,88 +42,148 @@ export default function RegisterPage() {
         <h2 className="text-3xl font-bold text-white mb-2">Create your account</h2>
         <p className="text-gray-400 mb-8">Join Ybuddy and start your fitness journey</p>
 
-        {/* Role toggle */}
-        <div className="flex gap-3 mb-8">
-          {(['CLIENT', 'COACH'] as const).map((r) => (
-            <button
-              key={r}
-              type="button"
-              onClick={() => setRole(r)}
-              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all border ${
-                role === r
-                  ? 'bg-gold-500 text-navy-900 border-gold-500'
-                  : 'bg-navy-800 text-gray-400 border-navy-600 hover:border-gold-500/50'
-              }`}
-            >
-              {r === 'CLIENT' ? '🏃 I am a Client' : '🏋️ I am a Coach'}
-            </button>
-          ))}
-        </div>
+        {/* RGAA 4.1 — Critère 11.1 : rôle du groupe via fieldset/legend */}
+        <fieldset className="mb-8">
+          <legend className="sr-only">Je suis</legend>
+          <div className="flex gap-3" role="group" aria-label="Type de compte">
+            {(['CLIENT', 'COACH'] as const).map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRole(r)}
+                aria-pressed={role === r}
+                className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all border ${
+                  role === r
+                    ? 'bg-gold-500 text-navy-900 border-gold-500'
+                    : 'bg-navy-800 text-gray-400 border-navy-600 hover:border-gold-500/50'
+                }`}
+              >
+                {r === 'CLIENT' ? '🏃 Je suis Client' : '🏋️ Je suis Coach'}
+              </button>
+            ))}
+          </div>
+        </fieldset>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate aria-label="Formulaire d'inscription">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+              <label htmlFor="reg-name" className="block text-sm font-medium text-gray-300 mb-2">
+                Nom complet <span aria-hidden="true" className="text-red-400">*</span>
+              </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                <input className="input-field pl-10" placeholder="John Doe" value={form.name} onChange={set('name')} required />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" aria-hidden="true" />
+                <input
+                  id="reg-name"
+                  className="input-field pl-10"
+                  placeholder="Jean Dupont"
+                  value={form.name}
+                  onChange={set('name')}
+                  required
+                  aria-required="true"
+                  autoComplete="name"
+                />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+              <label htmlFor="reg-email" className="block text-sm font-medium text-gray-300 mb-2">
+                Adresse email <span aria-hidden="true" className="text-red-400">*</span>
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                <input type="email" className="input-field pl-10" placeholder="you@example.com" value={form.email} onChange={set('email')} required />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" aria-hidden="true" />
+                <input
+                  id="reg-email"
+                  type="email"
+                  className="input-field pl-10"
+                  placeholder="vous@exemple.com"
+                  value={form.email}
+                  onChange={set('email')}
+                  required
+                  aria-required="true"
+                  autoComplete="email"
+                />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+            <label htmlFor="reg-password" className="block text-sm font-medium text-gray-300 mb-2">
+              Mot de passe <span aria-hidden="true" className="text-red-400">*</span>
+            </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" aria-hidden="true" />
               <input
+                id="reg-password"
                 type={showPass ? 'text' : 'password'}
                 className="input-field pl-10 pr-10"
-                placeholder="Min 6 characters"
+                placeholder="6 caractères minimum"
                 value={form.password}
                 onChange={set('password')}
                 minLength={6}
                 required
+                aria-required="true"
+                autoComplete="new-password"
               />
-              <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
-                {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              <button
+                type="button"
+                onClick={() => setShowPass(!showPass)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                aria-label={showPass ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                aria-pressed={showPass}
+              >
+                {showPass ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
               </button>
             </div>
           </div>
 
           {role === 'COACH' && (
             <div className="space-y-4 p-4 bg-navy-800/50 rounded-lg border border-navy-600">
-              <p className="text-gold-400 text-sm font-medium">Coach profile settings</p>
+              <p className="text-gold-400 text-sm font-medium" aria-live="polite">Paramètres du profil Coach</p>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Slug (unique URL)</label>
+                <label htmlFor="reg-slug" className="block text-sm font-medium text-gray-300 mb-2">
+                  Slug (URL unique)
+                </label>
                 <div className="relative">
-                  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" aria-hidden="true" />
                   <input
+                    id="reg-slug"
                     className="input-field pl-10"
                     placeholder="jade-fit"
                     value={form.slug}
                     onChange={set('slug')}
                     pattern="[a-z0-9-]+"
-                    title="Lowercase letters, numbers, and hyphens only"
+                    aria-describedby="reg-slug-hint"
+                    title="Lettres minuscules, chiffres et tirets uniquement"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">ybuddy.com/apply/{form.slug || 'your-slug'}</p>
+                <p id="reg-slug-hint" className="text-xs text-gray-500 mt-1">
+                  ybuddy.com/apply/{form.slug || 'votre-slug'}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Profile Headline</label>
-                <input className="input-field" placeholder="Train with Jade" value={form.publicProfileName} onChange={set('publicProfileName')} />
+                <label htmlFor="reg-headline" className="block text-sm font-medium text-gray-300 mb-2">
+                  Accroche du profil
+                </label>
+                <input
+                  id="reg-headline"
+                  className="input-field"
+                  placeholder="Entraînez-vous avec Jade"
+                  value={form.publicProfileName}
+                  onChange={set('publicProfileName')}
+                  autoComplete="off"
+                />
               </div>
             </div>
           )}
 
-          <button type="submit" disabled={loading} className="btn-gold w-full flex items-center justify-center gap-2 py-3 mt-2">
-            {loading ? <div className="w-5 h-5 border-2 border-navy-900 border-t-transparent rounded-full animate-spin" /> : 'Create Account'}
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-gold w-full flex items-center justify-center gap-2 py-3 mt-2"
+            aria-busy={loading}
+          >
+            {loading
+              ? <><div className="w-5 h-5 border-2 border-navy-900 border-t-transparent rounded-full animate-spin" aria-hidden="true" /><span className="sr-only">Création du compte en cours…</span></>
+              : 'Créer mon compte'}
           </button>
         </form>
 

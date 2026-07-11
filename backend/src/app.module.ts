@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ClientsModule } from './clients/clients.module';
@@ -20,6 +22,10 @@ import { Request } from './requests/request.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    // ── Rate limiting global (OWASP A04 — brute force) ────────────────────────
+    // Limite : 20 requêtes par 60 secondes par IP
+    // Sur la route POST /api/auth/login : limite réduite à 5 tentatives (voir AuthModule)
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 20 }]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
@@ -42,6 +48,10 @@ import { Request } from './requests/request.entity';
     RequestsModule,
     AdminModule,
     CoachesModule,
+  ],
+  providers: [
+    // ThrottlerGuard appliqué globalement à toutes les routes
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}

@@ -28,7 +28,13 @@ export class Exercise {
   gifUrl: string;
 
   @Column({ nullable: true })
+  videoUrl: string;
+
+  @Column({ nullable: true, type: 'text' })
   description: string;
+
+  @Column({ nullable: true, type: 'text' })
+  instructions: string;
 
   @OneToMany(() => ProgramExercise, (pe) => pe.exercise)
   programExercises: ProgramExercise[];

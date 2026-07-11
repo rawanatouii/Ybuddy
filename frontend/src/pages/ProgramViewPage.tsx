@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { programsApi } from '../services/api';
 import { ArrowLeft, Dumbbell, BedDouble, ChevronDown, ChevronUp } from 'lucide-react';
+import ExerciseModal from '../components/ExerciseModal';
 
 export default function ProgramViewPage() {
   const { id } = useParams<{ id: string }>();
   const [program, setProgram] = useState<any>(null);
   const [openDay, setOpenDay] = useState<number | null>(0);
   const [loading, setLoading] = useState(true);
+  const [modalEx, setModalEx] = useState<any>(null);
 
   useEffect(() => {
     programsApi.getById(+id!).then((r) => setProgram(r.data)).finally(() => setLoading(false));
@@ -20,6 +22,7 @@ export default function ProgramViewPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
+      <ExerciseModal exercise={modalEx} onClose={() => setModalEx(null)} />
       <Link to="/client" className="flex items-center gap-2 text-gray-400 hover:text-gold-400 mb-6 transition-colors">
         <ArrowLeft className="w-4 h-4" /> Back to Dashboard
       </Link>
@@ -56,7 +59,11 @@ export default function ProgramViewPage() {
                   <p className="text-center text-gray-500 py-6 text-sm">No exercises yet.</p>
                 )}
                 {day.exercises?.map((pe: any) => (
-                  <div key={pe.id} className="flex items-center gap-4 px-5 py-4">
+                  <div
+                    key={pe.id}
+                    className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-navy-800/50 transition-colors"
+                    onClick={() => setModalEx(pe.exercise)}
+                  >
                     {pe.exercise.gifUrl ? (
                       <img src={pe.exercise.gifUrl} alt={pe.exercise.name} className="w-16 h-16 rounded-lg object-cover bg-navy-800" />
                     ) : (
@@ -65,7 +72,7 @@ export default function ProgramViewPage() {
                       </div>
                     )}
                     <div className="flex-1">
-                      <p className="font-medium text-white">{pe.exercise.name}</p>
+                      <p className="font-medium text-white hover:text-gold-400 transition-colors">{pe.exercise.name}</p>
                       <p className="text-xs text-gold-400 capitalize mt-0.5">{pe.exercise.muscleGroup?.replace('_', ' ')}</p>
                     </div>
                     <div className="text-right">

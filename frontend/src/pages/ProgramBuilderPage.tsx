@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { programsApi, exercisesApi } from '../services/api';
 import { ArrowLeft, Dumbbell, BedDouble, Plus, Trash2, Send, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ExerciseModal from '../components/ExerciseModal';
 
 const MUSCLE_GROUPS = ['all', 'chest', 'back', 'shoulders', 'arms', 'legs', 'glutes', 'core', 'cardio', 'full_body'];
 
@@ -15,6 +16,7 @@ export default function ProgramBuilderPage() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [addingEx, setAddingEx] = useState<number | null>(null);
+  const [modalEx, setModalEx] = useState<any>(null);
 
   const load = async () => {
     const [prog, exs] = await Promise.all([
@@ -74,6 +76,7 @@ export default function ProgramBuilderPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
+      <ExerciseModal exercise={modalEx} onClose={() => setModalEx(null)} />
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Link to="/coach" className="text-gray-400 hover:text-gold-400 transition-colors">
@@ -150,15 +153,17 @@ export default function ProgramBuilderPage() {
               )}
               {currentDay?.exercises?.map((pe: any) => (
                 <div key={pe.id} className="card flex items-center gap-3">
-                  {pe.exercise.gifUrl ? (
-                    <img src={pe.exercise.gifUrl} alt="" className="w-12 h-12 rounded-lg object-cover" />
-                  ) : (
-                    <div className="w-12 h-12 bg-navy-700 rounded-lg flex items-center justify-center">
-                      <Dumbbell className="w-5 h-5 text-gold-500/50" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{pe.exercise.name}</p>
+                  <button onClick={() => setModalEx(pe.exercise)} className="flex-shrink-0">
+                    {pe.exercise.gifUrl ? (
+                      <img src={pe.exercise.gifUrl} alt="" className="w-12 h-12 rounded-lg object-cover hover:opacity-80 transition-opacity" />
+                    ) : (
+                      <div className="w-12 h-12 bg-navy-700 rounded-lg flex items-center justify-center hover:bg-navy-600 transition-colors">
+                        <Dumbbell className="w-5 h-5 text-gold-500/50" />
+                      </div>
+                    )}
+                  </button>
+                  <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setModalEx(pe.exercise)}>
+                    <p className="text-sm font-medium text-white truncate hover:text-gold-400 transition-colors">{pe.exercise.name}</p>
                     <p className="text-xs text-gold-400">{pe.sets}×{pe.reps}</p>
                   </div>
                   <button onClick={() => removeExercise(pe.id)} className="text-red-400/60 hover:text-red-400 transition-colors">
@@ -196,15 +201,17 @@ export default function ProgramBuilderPage() {
             )}
             {filteredExercises.map((ex: any) => (
               <div key={ex.id} className="card flex items-center gap-3 py-3">
-                {ex.gifUrl ? (
-                  <img src={ex.gifUrl} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
-                ) : (
-                  <div className="w-10 h-10 bg-navy-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Dumbbell className="w-4 h-4 text-gold-500/50" />
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{ex.name}</p>
+                <button onClick={() => setModalEx(ex)} className="flex-shrink-0">
+                  {ex.gifUrl ? (
+                    <img src={ex.gifUrl} alt="" className="w-10 h-10 rounded-lg object-cover hover:opacity-80 transition-opacity" />
+                  ) : (
+                    <div className="w-10 h-10 bg-navy-700 rounded-lg flex items-center justify-center hover:bg-navy-600 transition-colors">
+                      <Dumbbell className="w-4 h-4 text-gold-500/50" />
+                    </div>
+                  )}
+                </button>
+                <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setModalEx(ex)}>
+                  <p className="text-sm font-medium text-white truncate hover:text-gold-400 transition-colors">{ex.name}</p>
                   <p className="text-xs text-gold-400 capitalize">{ex.muscleGroup?.replace('_', ' ')}</p>
                 </div>
                 <button
