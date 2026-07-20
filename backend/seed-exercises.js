@@ -17,15 +17,20 @@ const MUSCLE_MAP = {
   'UPPER ARMS': 'arms',
   'LOWER ARMS': 'arms',
   ARMS: 'arms',
+  TRICEPS: 'arms',
+  BICEPS: 'arms',
+  FOREARMS: 'arms',
   QUADRICEPS: 'legs',
   THIGHS: 'legs',
   'UPPER LEGS': 'legs',
   'LOWER LEGS': 'legs',
   CALVES: 'legs',
+  HIPS: 'glutes',
   GLUTES: 'glutes',
   WAIST: 'core',
   CORE: 'core',
   ABS: 'core',
+  ABDOMINALS: 'core',
   CARDIO: 'cardio',
   NECK: 'full_body',
   'FULL BODY': 'full_body',
@@ -81,7 +86,7 @@ async function main() {
   console.log('✅ Connecté à la base de données\n');
 
   // Étape 1 : récupérer les IDs (max MAX_PAGES pages)
-  const MAX_PAGES = 2; // 2 pages × 100 = 200 exercices, suffisant pour la démo
+  const MAX_PAGES = 10; // 10 pages × 100 = 1000 exercices max
   const allExercises = [];
   let cursor = null;
   let page = 1;
