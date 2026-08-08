@@ -34,7 +34,7 @@ export default function ProgramBuilderPage() {
     try {
       await programsApi.setDayType(day.id, newType);
       await load();
-    } catch { toast.error('Failed to update day'); }
+    } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to update day'); }
   };
 
   const addExercise = async (exerciseId: number) => {
@@ -46,7 +46,7 @@ export default function ProgramBuilderPage() {
       await programsApi.addExercise(day.id, { exerciseId, sets: 3, reps: 10 });
       await load();
       toast.success('Exercise added');
-    } catch { toast.error('Failed to add exercise'); }
+    } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to add exercise'); }
     finally { setAddingEx(null); }
   };
 
@@ -54,7 +54,7 @@ export default function ProgramBuilderPage() {
     try {
       await programsApi.removeExercise(peId);
       await load();
-    } catch { toast.error('Failed to remove'); }
+    } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to remove exercise'); }
   };
 
   const sendProgram = async () => {
@@ -63,7 +63,7 @@ export default function ProgramBuilderPage() {
       await programsApi.send(+id!);
       toast.success('Program sent to client!');
       await load();
-    } catch { toast.error('Failed to send'); }
+    } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to send program'); }
     finally { setSending(false); }
   };
 

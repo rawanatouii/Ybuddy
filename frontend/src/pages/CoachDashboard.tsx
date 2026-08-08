@@ -24,8 +24,8 @@ export default function CoachDashboard() {
       await requestsApi.updateStatus(id, status);
       toast.success(`Request ${status}`);
       load();
-    } catch {
-      toast.error('Failed to update');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to update request');
     }
   };
 

@@ -42,7 +42,7 @@ export default function AdminDashboard() {
       toast.success('Exercise added!');
       setNewEx({ name: '', muscleGroup: MUSCLE_GROUPS[0], gifUrl: '', description: '' });
       await load();
-    } catch { toast.error('Failed to create exercise'); }
+    } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to create exercise'); }
     finally { setSaving(false); }
   };
 
@@ -54,7 +54,7 @@ export default function AdminDashboard() {
       toast.success('Updated!');
       setEditingEx(null);
       await load();
-    } catch { toast.error('Failed to update'); }
+    } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to update exercise'); }
     finally { setSaving(false); }
   };
 
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
       await exercisesApi.delete(id);
       toast.success('Deleted');
       await load();
-    } catch { toast.error('Failed to delete'); }
+    } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to delete exercise'); }
   };
 
   const filteredEx = filterMuscle === 'all' ? exercises : exercises.filter((e) => e.muscleGroup === filterMuscle);
