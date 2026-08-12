@@ -26,6 +26,7 @@ export class UsersService implements OnModuleInit {
           name: 'Super Admin',
           slug: 'superadmin',
           publicProfileName: 'Super Admin',
+          isVerified: true,
         }),
       );
       console.log('Admin seeded:', adminEmail);
