@@ -7,6 +7,7 @@ import { ProgramDay, DayType } from './program-day.entity';
 import { ProgramExercise } from './program-exercise.entity';
 import { ClientsService } from '../clients/clients.service';
 import { ExercisesService } from '../exercises/exercises.service';
+import { MailService } from '../mail/mail.service';
 
 const mockClient = { id: 1, user: { id: 10, name: 'Alice' } };
 const mockExercise = { id: 5, name: 'Squat', muscleGroup: 'legs' };
@@ -41,6 +42,10 @@ const mockExercisesService = {
   findById: jest.fn(),
 };
 
+const mockMailService = {
+  sendClientProgramReady: jest.fn(),
+};
+
 describe('ProgramsService', () => {
   let service: ProgramsService;
 
@@ -53,6 +58,7 @@ describe('ProgramsService', () => {
         { provide: getRepositoryToken(ProgramExercise), useValue: mockPeRepo },
         { provide: ClientsService, useValue: mockClientsService },
         { provide: ExercisesService, useValue: mockExercisesService },
+        { provide: MailService, useValue: mockMailService },
       ],
     }).compile();
 
