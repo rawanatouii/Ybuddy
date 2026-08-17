@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ApplyPage from './pages/ApplyPage';
 import ProgramBuilderPage from './pages/ProgramBuilderPage';
 import ProgramViewPage from './pages/ProgramViewPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 function RootRedirect() {
   const { user } = useAuth();
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/apply/:slug" element={<ApplyPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route
           path="/client"
           element={

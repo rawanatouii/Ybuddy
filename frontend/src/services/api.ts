@@ -8,10 +8,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+const AUTH_ENDPOINTS = ['/auth/login', '/auth/register'];
+
 api.interceptors.response.use(
   (r) => r,
   (err) => {
-    if (err.response?.status === 401) {
+    const isAuthEndpoint = AUTH_ENDPOINTS.some((url) => err.config?.url?.includes(url));
+    if (err.response?.status === 401 && !isAuthEndpoint) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login?reason=session-expired';
@@ -25,6 +28,7 @@ export default api;
 export const authApi = {
   login: (email: string, password: string) => api.post('/auth/login', { email, password }),
   register: (data: object) => api.post('/auth/register', data),
+  verifyEmail: (token: string) => api.get(`/auth/verify-email?token=${token}`),
   me: () => api.get('/auth/me'),
 };
 
@@ -68,4 +72,5 @@ export const programsApi = {
 export const adminApi = {
   getStats: () => api.get('/admin/stats'),
   getUsers: () => api.get('/admin/users'),
+  deleteUser: (id: number) => api.delete(`/admin/users/${id}`),
 };

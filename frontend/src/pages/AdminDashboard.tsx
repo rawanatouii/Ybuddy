@@ -67,6 +67,15 @@ export default function AdminDashboard() {
     } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to delete exercise'); }
   };
 
+  const deleteUser = async (id: number, email: string) => {
+    if (!confirm(`Delete user ${email}? This also removes their requests and programs.`)) return;
+    try {
+      await adminApi.deleteUser(id);
+      toast.success('User deleted');
+      await load();
+    } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to delete user'); }
+  };
+
   const filteredEx = filterMuscle === 'all' ? exercises : exercises.filter((e) => e.muscleGroup === filterMuscle);
 
   return (
@@ -198,7 +207,7 @@ export default function AdminDashboard() {
             <table className="w-full">
               <thead className="bg-navy-700">
                 <tr>
-                  {['ID', 'Name', 'Email', 'Role', 'Slug', 'Joined'].map((h) => (
+                  {['ID', 'Name', 'Email', 'Role', 'Slug', 'Joined', 'Actions'].map((h) => (
                     <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -214,6 +223,15 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-4 py-3 text-gray-400 text-sm font-mono">{u.slug || '—'}</td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => deleteUser(u.id, u.email)}
+                        className="text-gray-400 hover:text-red-400 transition-colors p-1"
+                        aria-label={`Delete user ${u.email}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
@@ -28,6 +28,12 @@ export class AuthController {
   @ApiResponse({ status: 429, description: 'Too many requests - rate limit exceeded' })
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Get('verify-email')
+  @ApiOperation({ summary: 'Verify email address via token' })
+  verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyEmail(token);
   }
 
   @UseGuards(JwtAuthGuard)

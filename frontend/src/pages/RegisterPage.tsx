@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Dumbbell, Mail, Lock, User, Briefcase, Eye, EyeOff } from 'lucide-react';
+import { Dumbbell, Mail, Lock, User, Briefcase, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
@@ -10,6 +10,8 @@ export default function RegisterPage() {
   const [role, setRole] = useState<'CLIENT' | 'COACH'>('CLIENT');
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [sentTo, setSentTo] = useState('');
   const [form, setForm] = useState({
     email: '', password: '', name: '', slug: '', publicProfileName: '',
   });
@@ -22,14 +24,40 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register({ ...form, role });
-      toast.success('Account created!');
-      navigate('/');
+      setSentTo(form.email);
+      setEmailSent(true);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
+
+  if (emailSent) {
+    return (
+      <div className="min-h-screen bg-navy-950 flex items-center justify-center p-6">
+        <div className="w-full max-w-md text-center">
+          <div className="flex items-center gap-2 justify-center mb-8">
+            <Dumbbell className="text-gold-500 w-7 h-7" />
+            <span className="font-display text-2xl font-bold">Y<span className="text-gold-500">buddy</span></span>
+          </div>
+          <div className="bg-navy-800 rounded-2xl p-8 border border-navy-600">
+            <CheckCircle className="w-16 h-16 text-gold-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">Vérifiez votre email</h2>
+            <p className="text-gray-400 mb-4">
+              Un email de confirmation a été envoyé à <span className="text-gold-400 font-medium">{sentTo}</span>.
+            </p>
+            <p className="text-gray-500 text-sm mb-6">
+              Cliquez sur le lien dans l'email pour activer votre compte et accéder à Ybuddy.
+            </p>
+            <Link to="/login" className="btn-gold inline-block px-6 py-2 rounded-lg font-semibold">
+              Retour à la connexion
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-navy-950 flex items-center justify-center p-6">

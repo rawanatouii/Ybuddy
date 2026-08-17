@@ -10,3 +10,65 @@ services:
       MARIADB_DATABASE: ybuddy_db
       MARIADB_USER: ybuddy
       MARIADB_PASSWORD: ybuddy_pass
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -uroot -p\"$$MARIADB_ROOT_PASSWORD\" --silent || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  backend:
+    build:
+      context: ./backend
+    container_name: ybuddy_backend
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    env_file:
+      - ./backend/.env
+    environment:
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+    ports:
+      - "3001:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/docs"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: ybuddy_frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+volumes:
+  mariadb_data:
+    external: true
+    name: "6018bd5f26d8b9188bca104111a813db1ac5cc0763492c12fafa00543d384279"

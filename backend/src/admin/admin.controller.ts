@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Delete, Param, ParseIntPipe, Request as Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -28,6 +28,15 @@ export class AdminController {
   @ApiResponse({ status: 403, description: 'Forbidden - Admin access required' })
   getUsers() {
     return this.adminService.getAllUsers();
+  }
+
+  @Delete('users/:id')
+  @ApiOperation({ summary: 'Delete a user and their related data (Admin only)' })
+  @ApiResponse({ status: 200, description: 'User deleted' })
+  @ApiResponse({ status: 400, description: 'Cannot delete your own account' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  deleteUser(@Param('id', ParseIntPipe) id: number, @Req() req) {
+    return this.adminService.deleteUser(id, req.user.id);
   }
 }
 

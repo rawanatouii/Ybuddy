@@ -7,9 +7,10 @@ import { ProgramsService } from './programs.service';
 import { ProgramsController } from './programs.controller';
 import { ClientsModule } from '../clients/clients.module';
 import { ExercisesModule } from '../exercises/exercises.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Program, ProgramDay, ProgramExercise]), ClientsModule, ExercisesModule],
+  imports: [TypeOrmModule.forFeature([Program, ProgramDay, ProgramExercise]), ClientsModule, ExercisesModule, MailModule],
   providers: [ProgramsService],
   controllers: [ProgramsController],
   exports: [ProgramsService],

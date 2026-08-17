@@ -6,6 +6,7 @@ import { ProgramDay, DayType } from './program-day.entity';
 import { ProgramExercise } from './program-exercise.entity';
 import { ClientsService } from '../clients/clients.service';
 import { ExercisesService } from '../exercises/exercises.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class ProgramsService {
@@ -15,6 +16,7 @@ export class ProgramsService {
     @InjectRepository(ProgramExercise) private peRepo: Repository<ProgramExercise>,
     private clientsService: ClientsService,
     private exercisesService: ExercisesService,
+    private mailService: MailService,
   ) {}
 
   async createProgram(coachId: number, clientId: number, data: { startDate?: Date; duration?: string; days: number }) {
@@ -54,7 +56,16 @@ export class ProgramsService {
 
   async sendToClient(programId: number) {
     await this.programRepo.update(programId, { sent: true });
-    return this.findById(programId);
+    const program = await this.findById(programId);
+
+    const clientEmail = program.client?.user?.email;
+    const clientName = program.client?.name;
+    const coachName = program.coach?.name || program.coach?.publicProfileName;
+    if (clientEmail && clientName && coachName) {
+      await this.mailService.sendClientProgramReady(clientEmail, clientName, coachName);
+    }
+
+    return program;
   }
 
   async findById(id: number) {

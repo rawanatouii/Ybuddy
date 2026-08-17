@@ -42,11 +42,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (registerData: object) => {
-    const { data } = await authApi.register(registerData);
-    localStorage.setItem('token', data.access_token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    setToken(data.access_token);
-    setUser(data.user);
+    await authApi.register(registerData);
+    // Registration now requires email verification — no token returned
   };
 
   const logout = () => {

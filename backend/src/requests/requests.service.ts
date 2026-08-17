@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Request, RequestStatus } from './request.entity';
 import { ClientsService } from '../clients/clients.service';
 import { UsersService } from '../users/users.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class RequestsService {
@@ -11,6 +12,7 @@ export class RequestsService {
     @InjectRepository(Request) private requestRepo: Repository<Request>,
     private clientsService: ClientsService,
     private usersService: UsersService,
+    private mailService: MailService,
   ) {}
 
   async create(userId: number, coachSlug: string) {
@@ -25,7 +27,15 @@ export class RequestsService {
     if (existing) return existing;
 
     const req = this.requestRepo.create({ client, coach, status: RequestStatus.PENDING });
-    return this.requestRepo.save(req);
+    const saved = await this.requestRepo.save(req);
+
+    await this.mailService.sendCoachNewRequest(
+      coach.email,
+      coach.name || coach.publicProfileName,
+      client.name,
+    );
+
+    return saved;
   }
 
   async findByCoach(coachId: number) {

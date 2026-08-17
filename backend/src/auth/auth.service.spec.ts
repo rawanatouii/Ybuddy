@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { User, UserRole } from '../users/user.entity';
+import { MailService } from '../mail/mail.service';
 import * as bcrypt from 'bcryptjs';
 
 // ── Mock repository ────────────────────────────────────────────────────────────
@@ -15,6 +16,8 @@ const mockUser: User = {
   name: 'Jeanne Coach',
   slug: 'jeanne-coach',
   publicProfileName: 'Jeanne',
+  isVerified: true,
+  verificationToken: null,
   createdAt: new Date(),
   client: null,
   coachRequests: [],
@@ -31,6 +34,10 @@ const mockJwtService = {
   sign: jest.fn().mockReturnValue('mock.jwt.token'),
 };
 
+const mockMailService = {
+  sendVerificationEmail: jest.fn(),
+};
+
 // ── Suite ──────────────────────────────────────────────────────────────────────
 describe('AuthService', () => {
   let service: AuthService;
@@ -41,9 +48,12 @@ describe('AuthService', () => {
         AuthService,
         { provide: getRepositoryToken(User), useValue: mockRepo },
         { provide: JwtService, useValue: mockJwtService },
+        { provide: MailService, useValue: mockMailService },
       ],
     }).compile();
 
+
+    
     service = module.get<AuthService>(AuthService);
     jest.clearAllMocks();
   });
@@ -58,7 +68,7 @@ describe('AuthService', () => {
       name: 'Agathe Client',
     };
 
-    it('crée un utilisateur et retourne un token JWT', async () => {
+    it('crée un utilisateur et envoie un email de vérification', async () => {
       mockRepo.findOne.mockResolvedValue(null);
       mockRepo.create.mockReturnValue({ ...mockUser, email: dto.email });
       mockRepo.save.mockResolvedValue({ ...mockUser, email: dto.email });
@@ -67,8 +77,8 @@ describe('AuthService', () => {
 
       expect(mockRepo.findOne).toHaveBeenCalledWith({ where: { email: dto.email } });
       expect(mockRepo.save).toHaveBeenCalledTimes(1);
-      expect(result).toHaveProperty('access_token', 'mock.jwt.token');
-      expect(result.user).toHaveProperty('email', dto.email);
+      expect(mockMailService.sendVerificationEmail).toHaveBeenCalledWith(dto.email, expect.any(String));
+      expect(result).toHaveProperty('message');
     });
 
     it('génère un slug automatique si non fourni', async () => {
