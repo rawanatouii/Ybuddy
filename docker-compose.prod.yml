@@ -3,13 +3,11 @@ services:
     image: mariadb:10.11
     container_name: ybuddy_db
     restart: unless-stopped
-    ports:
-      - "3307:3306"
     environment:
-      MARIADB_ROOT_PASSWORD: rootpassword
-      MARIADB_DATABASE: ybuddy_db
-      MARIADB_USER: ybuddy
-      MARIADB_PASSWORD: ybuddy_pass
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE:-ybuddy_db}
+      MARIADB_USER: ${DB_USERNAME:-ybuddy}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
     healthcheck:
@@ -37,9 +35,11 @@ services:
     environment:
       DB_HOST: mariadb
       DB_PORT: 3306
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
-    ports:
-      - "3001:3000"
+      DB_USERNAME: ${DB_USERNAME:-ybuddy}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE:-ybuddy_db}
+      NODE_ENV: production
+      FRONTEND_URL: https://${DOMAIN}
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/docs"]
       interval: 15s
@@ -49,8 +49,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1024M
+          cpus: '0.9'
+          memory: 896M
 
   frontend:
     build:
@@ -60,13 +60,34 @@ services:
     depends_on:
       backend:
         condition: service_healthy
-    ports:
-      - "8080:80"
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 128M
+          cpus: '0.2'
+          memory: 96M
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: ybuddy_caddy
+    restart: unless-stopped
+    depends_on:
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    deploy:
+      resources:
+        limits:
+          cpus: '0.15'
+          memory: 64M
 
 volumes:
   mariadb_data:
+  caddy_data:
+  caddy_config:
