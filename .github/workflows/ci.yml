@@ -156,6 +156,16 @@ jobs:
       - name: Checkout du code
         uses: actions/checkout@v4
 
+      - name: Copier les fichiers vers le VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "."
+          target: "/opt/ybuddy"
+          rm: false
+
       - name: Déploiement via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -163,14 +173,8 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /opt/ybuddy || (sudo mkdir -p /opt/ybuddy && sudo chown ubuntu:ubuntu /opt/ybuddy && cd /opt/ybuddy)
-            if [ ! -d ".git" ]; then
-              git clone https://github.com/${{ github.repository }} .
-            else
-              git pull origin main
-            fi
-            cp /opt/ybuddy/.env.production /opt/ybuddy/backend/.env 2>/dev/null || true
-            docker compose -f docker-compose.yml pull 2>/dev/null || true
+            cp /opt/ybuddy/.env.production /opt/ybuddy/backend/.env
+            cd /opt/ybuddy
             docker compose -f docker-compose.yml up -d --build
             docker system prune -f
 
