@@ -37,6 +37,7 @@ export class User {
   @Column({ default: false })
   isVerified: boolean;
 
+  @Exclude()
   @Column({ nullable: true })
   verificationToken: string;
 

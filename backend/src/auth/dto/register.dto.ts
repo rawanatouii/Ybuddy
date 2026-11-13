@@ -2,6 +2,10 @@ import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from 'cl
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from '../../users/user.entity';
 
+// Only CLIENT and COACH can self-register — ADMIN is provisioned via seed only
+const REGISTRABLE_ROLES = [UserRole.CLIENT, UserRole.COACH] as const;
+type RegistrableRole = (typeof REGISTRABLE_ROLES)[number];
+
 export class RegisterDto {
   @ApiProperty({ example: 'user@example.com', description: 'User email address' })
   @IsEmail()
@@ -12,9 +16,9 @@ export class RegisterDto {
   @MinLength(6)
   password: string;
 
-  @ApiProperty({ enum: UserRole, example: UserRole.CLIENT, description: 'User role' })
-  @IsEnum(UserRole)
-  role: UserRole;
+  @ApiProperty({ enum: REGISTRABLE_ROLES, example: UserRole.CLIENT, description: 'User role (CLIENT or COACH only)' })
+  @IsEnum(REGISTRABLE_ROLES)
+  role: RegistrableRole;
 
   @ApiPropertyOptional({ example: 'John Doe', description: 'User full name' })
   @IsOptional()

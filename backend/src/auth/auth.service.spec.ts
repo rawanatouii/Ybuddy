@@ -64,7 +64,7 @@ describe('AuthService', () => {
     const dto = {
       email: 'nouveau@ybuddy.com',
       password: 'motdepasse123',
-      role: UserRole.CLIENT,
+      role: UserRole.CLIENT as const,
       name: 'Agathe Client',
     };
 

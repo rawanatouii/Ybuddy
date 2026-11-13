@@ -43,8 +43,9 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Returns current user profile (without password)' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   me(@Request() req) {
-    const { password, ...user } = req.user;
-    return user;
+    // Explicit exclusion as defense-in-depth (ClassSerializerInterceptor also strips @Exclude() fields)
+    const { password, verificationToken, ...safeUser } = req.user;
+    return safeUser;
   }
 }
 
