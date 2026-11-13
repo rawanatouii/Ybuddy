@@ -41,12 +41,13 @@ export class ProgramsController {
 
   @Get(':id')
   @Roles(UserRole.COACH, UserRole.CLIENT, UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get program by ID' })
+  @ApiOperation({ summary: 'Get program by ID (owner or admin only)' })
   @ApiParam({ name: 'id', type: Number, description: 'Program ID' })
   @ApiResponse({ status: 200, description: 'Returns program details' })
+  @ApiResponse({ status: 403, description: 'Access denied' })
   @ApiResponse({ status: 404, description: 'Program not found' })
-  findOne(@Param('id') id: string) {
-    return this.programsService.findById(+id);
+  findOne(@Request() req, @Param('id') id: string) {
+    return this.programsService.findByIdForUser(+id, req.user.id, req.user.role);
   }
 
   @Post(':id/send')
@@ -54,8 +55,8 @@ export class ProgramsController {
   @ApiOperation({ summary: 'Send program to client (Coach only)' })
   @ApiParam({ name: 'id', type: Number, description: 'Program ID' })
   @ApiResponse({ status: 200, description: 'Program sent to client' })
-  send(@Param('id') id: string) {
-    return this.programsService.sendToClient(+id);
+  send(@Request() req, @Param('id') id: string) {
+    return this.programsService.sendToClient(+id, req.user.id);
   }
 
   @Post('day/:dayId/exercises')

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Program } from './program.entity';
@@ -54,7 +54,9 @@ export class ProgramsService {
     return this.dayRepo.findOne({ where: { id: dayId } });
   }
 
-  async sendToClient(programId: number) {
+  async sendToClient(programId: number, coachId: number) {
+    const prog = await this.findById(programId);
+    if (prog.coach?.id !== coachId) throw new ForbiddenException('Not your program');
     await this.programRepo.update(programId, { sent: true });
     const program = await this.findById(programId);
 
@@ -75,6 +77,14 @@ export class ProgramsService {
     });
     if (!prog) throw new NotFoundException('Program not found');
     return prog;
+  }
+
+  async findByIdForUser(id: number, userId: number, role: string) {
+    const prog = await this.findById(id);
+    if (role === 'ADMIN') return prog;
+    if (role === 'COACH' && prog.coach?.id === userId) return prog;
+    if (role === 'CLIENT' && prog.client?.user?.id === userId) return prog;
+    throw new ForbiddenException('Access denied');
   }
 
   async findByCoach(coachId: number) {

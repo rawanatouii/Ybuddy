@@ -42,11 +42,17 @@ export class UsersService implements OnModuleInit {
   }
 
   findBySlug(slug: string) {
-    return this.userRepo.findOne({ where: { slug, role: UserRole.COACH } });
+    return this.userRepo.findOne({
+      where: { slug, role: UserRole.COACH },
+      select: ['id', 'name', 'publicProfileName', 'slug', 'role', 'createdAt'],
+    });
   }
 
   findAllCoaches() {
-    return this.userRepo.find({ where: { role: UserRole.COACH } });
+    return this.userRepo.find({
+      where: { role: UserRole.COACH },
+      select: ['id', 'name', 'publicProfileName', 'slug', 'role', 'createdAt'],
+    });
   }
 
   findAll() {

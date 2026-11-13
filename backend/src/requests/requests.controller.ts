@@ -46,8 +46,8 @@ export class RequestsController {
   @ApiParam({ name: 'id', type: Number, description: 'Request ID' })
   @ApiResponse({ status: 200, description: 'Status updated successfully' })
   @ApiResponse({ status: 404, description: 'Request not found' })
-  updateStatus(@Param('id') id: string, @Body('status') status: RequestStatus) {
-    return this.requestsService.updateStatus(+id, status);
+  updateStatus(@Request() req, @Param('id') id: string, @Body('status') status: RequestStatus) {
+    return this.requestsService.updateStatus(+id, status, req.user.id);
   }
 
   @Get()

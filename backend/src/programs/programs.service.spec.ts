@@ -174,11 +174,12 @@ describe('ProgramsService', () => {
 
   describe('sendToClient', () => {
     it('marque le programme comme envoyé', async () => {
-      const sentProgram = { id: 1, sent: true, days: [] };
+      const coachId = 2;
+      const sentProgram = { id: 1, sent: true, days: [], coach: { id: coachId } };
       mockProgramRepo.update.mockResolvedValue({});
       mockProgramRepo.findOne.mockResolvedValue(sentProgram);
 
-      const result = await service.sendToClient(1);
+      const result = await service.sendToClient(1, coachId);
 
       expect(mockProgramRepo.update).toHaveBeenCalledWith(1, { sent: true });
       expect(result.sent).toBe(true);

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Request, RequestStatus } from './request.entity';
@@ -56,9 +56,10 @@ export class RequestsService {
     });
   }
 
-  async updateStatus(id: number, status: RequestStatus) {
-    const req = await this.requestRepo.findOne({ where: { id } });
+  async updateStatus(id: number, status: RequestStatus, coachId: number) {
+    const req = await this.requestRepo.findOne({ where: { id }, relations: ['coach'] });
     if (!req) throw new NotFoundException('Request not found');
+    if (req.coach.id !== coachId) throw new ForbiddenException('Not your request');
     req.status = status;
     return this.requestRepo.save(req);
   }
